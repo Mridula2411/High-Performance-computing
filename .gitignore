@@ -2,8 +2,8 @@
 *.dat
 *.lprof
 .DS_Store
-.venv
-.env
+.venv/
+.env/
 .ipynb_checkpoints
 .vscode/
 __pycache__/
