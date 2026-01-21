@@ -1,3 +1,9 @@
 *.stats
 *.dat
 *.lprof
+.DS_Store
+.venv
+.env
+.ipynb_checkpoints
+.vscode/
+__pycache__/
