@@ -1,6 +1,8 @@
 """Julia set generator without optional PIL-based image drawing"""
 import time
+from timeit import default_timer as timer
 from functools import wraps
+import numpy as np
 
 # area of complex space to investigate
 x1, x2, y1, y2 = -1.8, 1.8, -1.8, 1.8
@@ -10,14 +12,21 @@ c_real, c_imag = -0.62772, -.42193
 def timefn(fn):
     @wraps(fn)
     def measure_time(*args, **kwargs):
-        t1 = time.time()
-        result = fn(*args, **kwargs)
-        t2 = time.time()
-        print(f"@timefn: {fn.__name__} took {t2 - t1} seconds")
+        n = 5
+        times = []
+
+        for i in range(n):
+            t1 = timer()
+            result = fn(*args, **kwargs)
+            t2 = timer()
+            times.append(t2 - t1)
+        avg = np.mean(times)
+        std = np.std(times)
+        print(f"@timefn: {fn.__name__} took {avg:.6f} seconds, standard deviation: {std:.6f} (n={n})")
         return result
     return measure_time
 
-
+@timefn
 def calc_pure_python(desired_width, max_iterations):
     """Create a list of complex coordinates (zs) and complex parameters (cs),
     build Julia set"""
@@ -46,11 +55,7 @@ def calc_pure_python(desired_width, max_iterations):
 
     print("Length of x:", len(x))
     print("Total elements:", len(zs))
-    start_time = time.time()
     output = calculate_z_serial_purepython(max_iterations, zs, cs)
-    end_time = time.time()
-    secs = end_time - start_time
-    print(calculate_z_serial_purepython.__name__ + " took", secs, "seconds")
 
     # This sum is expected for a 1000^2 grid with 300 iterations
     # It ensures that our code evolves exactly as we'd intended
@@ -72,4 +77,4 @@ def calculate_z_serial_purepython(maxiter, zs, cs):
 if __name__ == "__main__":
     # Calculate the Julia set using a pure Python solution with
     # reasonable defaults for a laptop
-    calc_pure_python(desired_width=1000, max_iterations=300) 
+    calc_pure_python(desired_width=1000, max_iterations=300)
