@@ -8,7 +8,7 @@ name = "profilers"
 version = "0.1.0"
 description = "A modular CPU, GPU, and Memory profiler"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 dependencies = [
     "psutil",
     "plotly",
