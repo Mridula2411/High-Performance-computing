@@ -3,6 +3,7 @@ import time
 from timeit import default_timer as timer
 from functools import wraps
 import numpy as np
+from profilers import profile_cpu
 
 # area of complex space to investigate
 x1, x2, y1, y2 = -1.8, 1.8, -1.8, 1.8

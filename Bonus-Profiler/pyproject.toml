@@ -1,0 +1,20 @@
+[build-system]
+# Include wheel to avoid build-env failures when installing in editable mode
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "profilers"
+version = "0.1.0"
+description = "A modular CPU, GPU, and Memory profiler"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "psutil",
+    "plotly",
+    "tabulate",
+    "ipywidgets", # Required for the live FigureWidget
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
