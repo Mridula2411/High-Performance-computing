@@ -3,6 +3,7 @@ import time
 from timeit import default_timer as timer
 from functools import wraps
 import numpy as np
+from profilers import profile_cpu
 
 # area of complex space to investigate
 x1, x2, y1, y2 = -1.8, 1.8, -1.8, 1.8
@@ -61,6 +62,7 @@ def calc_pure_python(desired_width, max_iterations):
     # It ensures that our code evolves exactly as we'd intended
     assert sum(output) == 33219980
 
+# @profile_cpu(interval=1)
 @timefn
 def calculate_z_serial_purepython(maxiter, zs, cs):
     """Calculate output list using Julia update rule"""

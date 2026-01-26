@@ -4,6 +4,7 @@ from profilers import profile_cpu
 grid_shape = (640, 640)
 
 # @profile
+@profile_cpu(interval=1)
 def evolve(grid, dt, D=1.0):
     xmax, ymax = grid_shape
     new_grid = [[0.0] * ymax for x in range(xmax)]
@@ -19,7 +20,7 @@ def evolve(grid, dt, D=1.0):
     return new_grid
 
 
-@profile_cpu(interval=1)
+
 def run_experiment(num_iterations):
     # Setting up initial conditions 
     xmax, ymax = grid_shape
