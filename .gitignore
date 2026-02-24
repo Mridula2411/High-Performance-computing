@@ -218,3 +218,5 @@ __marimo__/
 # other files
 *.dat
 *.stats
+*.tif
+*.tiff
