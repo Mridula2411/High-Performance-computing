@@ -1,14 +1,22 @@
 import numpy as np
+from array import array
 
-def dgemm_numpy(A, B, C):
-    """
-    Perform DGEMM: C = C + A * B
-    """
-    N = A.shape[0]
-
+def dgemm_lists(A, B, C, N):
     for i in range(N):
         for j in range(N):
             for k in range(N):
-                C[i, j] += A[i, k] * B[k, j]
+                C[i][j] += A[i][k] * B[k][j]
+    return C
 
+
+def dgemm_arrays(A, B, C, N):
+    for i in range(N):
+        for j in range(N):
+            for k in range(N):
+                C[i][j] += A[i][k] * B[k][j]
+    return C
+
+
+def dgemm_numpy(A, B, C):
+    C += A @ B
     return C

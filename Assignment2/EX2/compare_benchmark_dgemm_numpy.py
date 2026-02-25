@@ -1,74 +1,123 @@
 import numpy as np
 import time
-from dgemm import dgemm_numpy
+from array import array
+from statistics import mean, stdev
 
 
-def time_python_dgemm(A, B, C, repeats=3):
+# =====================================
+# DGEMM IMPLEMENTATIONS
+# =====================================
+
+def dgemm_lists(A, B, C, N):
+    for i in range(N):
+        for j in range(N):
+            for k in range(N):
+                C[i][j] += A[i][k] * B[k][j]
+    return C
+
+
+def dgemm_arrays(A, B, C, N):
+    for i in range(N):
+        for j in range(N):
+            for k in range(N):
+                C[i][j] += A[i][k] * B[k][j]
+    return C
+
+
+def dgemm_numpy_at(A, B, C):
+    C += A @ B
+    return C
+
+
+def dgemm_numpy_matmul(A, B, C):
+    C += np.matmul(A, B)
+    return C
+
+
+# =====================================
+# BENCHMARK FUNCTION
+# =====================================
+
+def benchmark(func, A, B, C, N=None, repeats=5):
     times = []
 
     for _ in range(repeats):
-        C_copy = C.copy()
+
+        # Copy C for fresh computation
+        if isinstance(C, np.ndarray):
+            C_copy = C.copy()
+        else:
+            C_copy = [row[:] for row in C]
+
         start = time.perf_counter()
-        dgemm_numpy(A, B, C_copy)
+
+        if N is not None:
+            func(A, B, C_copy, N)
+        else:
+            func(A, B, C_copy)
+
         end = time.perf_counter()
         times.append(end - start)
 
-    return np.mean(times)
+    return {
+        "mean": mean(times),
+        "std": stdev(times)
+    }
 
 
-def time_numpy_dgemm(A, B, C, repeats=10):
-    times = []
+# =====================================
+# FLOPS CALCULATION
+# =====================================
 
-    for _ in range(repeats):
-        C_copy = C.copy()
-        start = time.perf_counter()
-        C_copy += A @ B
-        end = time.perf_counter()
-        times.append(end - start)
-
-    return np.mean(times)
+def compute_gflops(N, time_seconds):
+    total_flops = 2 * (N ** 3)
+    return (total_flops / time_seconds) / 1e9
 
 
-def flops_dgemm(N):
-    return 2 * (N ** 3)
-
+# =====================================
+# MAIN
+# =====================================
 
 def main():
-    np.random.seed(0)
 
-    matrix_sizes = [64, 128, 256]
-    print(
-        f"{'N':>6} | "
-        f"{'Python DGEMM (s)':>18} | "
-        f"{'NumPy BLAS (s)':>16} | "
-        f"{'Speedup':>10} | "
-        f"{'Python FLOPs/s':>16} | "
-        f"{'BLAS FLOPs/s':>16}"
-    )
-    print("-" * 95)
+    sizes = [100, 200, 400]
+    repeats = 5
 
-    for N in matrix_sizes:
-        A = np.random.rand(N, N).astype(np.float64)
-        B = np.random.rand(N, N).astype(np.float64)
-        C = np.random.rand(N, N).astype(np.float64)
+    for N in sizes:
 
-        t_python = time_python_dgemm(A, B, C)
-        t_numpy = time_numpy_dgemm(A, B, C)
+        print("=" * 60)
+        print(f"Matrix size: {N} x {N}")
 
-        flops = flops_dgemm(N)
+        # Generate matrices
+        A_np = np.random.rand(N, N)
+        B_np = np.random.rand(N, N)
+        C_np = np.zeros((N, N))
 
-        flops_python = flops / t_python
-        flops_numpy = flops / t_numpy
-        speedup = t_python / t_numpy
+        # Lists
+        A_list = A_np.tolist()
+        B_list = B_np.tolist()
+        C_list = [[0.0] * N for _ in range(N)]
 
-        print(
-            f"{N:6d} | "
-            f"{t_python:18.4f} | "
-            f"{t_numpy:16.6f} | "
-            f"{speedup:10.1f} | "
-            f"{flops_python:16.3e} | "
-            f"{flops_numpy:16.3e}"
-        )
+        # Arrays
+        A_arr = [array('d', row) for row in A_np]
+        B_arr = [array('d', row) for row in B_np]
+        C_arr = [array('d', [0.0] * N) for _ in range(N)]
+
+        # Run benchmarks
+        results = {
+            "Lists": benchmark(dgemm_lists, A_list, B_list, C_list, N, repeats),
+            "Arrays": benchmark(dgemm_arrays, A_arr, B_arr, C_arr, N, repeats),
+            "NumPy @": benchmark(dgemm_numpy_at, A_np, B_np, C_np, None, repeats),
+            "NumPy matmul": benchmark(dgemm_numpy_matmul, A_np, B_np, C_np, None, repeats),
+        }
+
+        for name, stats in results.items():
+            gflops = compute_gflops(N, stats["mean"])
+
+            print(f"\n{name}:")
+            print(f"  Mean Time: {stats['mean']:.6f} s")
+            print(f"  Std Dev  : {stats['std']:.6f} s")
+            print(f"  GFLOPS   : {gflops:.3f}")
 
 
 if __name__ == "__main__":
