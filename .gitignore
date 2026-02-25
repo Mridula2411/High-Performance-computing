@@ -219,3 +219,4 @@ __marimo__/
 *.dat
 *.stats
 */dataset/*
+.DS_Store
