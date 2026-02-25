@@ -218,4 +218,5 @@ __marimo__/
 # other files
 *.dat
 *.stats
+*/dataset/*
 .DS_Store

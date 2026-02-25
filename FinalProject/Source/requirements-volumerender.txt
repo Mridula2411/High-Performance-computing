@@ -1,0 +1,7 @@
+dash>=2.0.0
+plotly
+numpy
+scipy
+matplotlib
+tifffile
+imageio
