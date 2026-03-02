@@ -220,3 +220,4 @@ __marimo__/
 *.stats
 */dataset/*
 .DS_Store
+vtk_output/
