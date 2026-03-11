@@ -219,5 +219,9 @@ __marimo__/
 *.dat
 *.stats
 */dataset/*
-.DS_Store
 vtk_output/
+.cython_cache/
+.DS_Store
+
+comparison_output/
+renders/
